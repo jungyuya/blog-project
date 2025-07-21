@@ -1,0 +1,91 @@
+service: blog-api-dev # 여러분의 서비스 이름. 변경하지 않는 것을 권장합니다.
+
+provider:
+  name: aws
+  runtime: go1.x 
+  region: ap-northeast-2 
+  stage: dev 
+  memorySize: 256
+  timeout: 15 # 람다 타임아웃 (초, 필요시 조정)
+  environment:
+    # 람다 함수에서 사용할 환경 변수 정의
+    DYNAMODB_TABLE: blog-posts 
+  iam:
+    role: # 람다 함수가 사용할 IAM 역할 정의
+      Fn::GetAtt:
+        - BlogLambdaExecutionRole 
+        - Arn
+
+package:
+  individually: true 
+
+plugins:
+  - serverless-go-plugin 
+
+functions:
+  getPosts:
+    handler: getPosts 
+    package:
+      patterns:
+        - getPosts
+    events:
+      - http:
+          path: posts
+          method: get
+          cors: true # CORS 활성화 
+
+  getPost:
+    handler: getPost 
+    package:
+      patterns:
+        - getPost
+    events:
+      - http:
+          path: posts/{postId}
+          method: get
+          cors: true
+
+  createPost:
+    handler: createPost
+    package:
+      patterns:
+        - createPost
+    events:
+      - http:
+          path: posts
+          method: post
+          cors: true
+          # authorizer: # Cognito 인증 추가 시 이 주석을 해제하고 ARN 채우기 (2단계에서 진행)
+          #   name: cognitoAuthorizer
+          #   type: COGNITO_USER_POOLS
+          #   arn: arn:aws:cognito-idp:ap-northeast-2:YOUR_AWS_ACCOUNT_ID:userpool/YOUR_COGNITO_USER_POOL_ID
+
+  updatePost:
+    handler: updatePost # <--- updatePost 디렉토리의 컴파일된 바이너리 이름
+    package:
+      patterns:
+        - updatePost
+    events:
+      - http:
+          path: posts/{postId}
+          method: put
+          cors: true
+          # authorizer: # Cognito 인증 추가 시 주석 해제 (2단계에서 진행)
+          #   name: cognitoAuthorizer
+          #   type: COGNITO_USER_POOLS
+          #   arn: arn:aws:cognito-idp:ap-northeast-2:YOUR_AWS_ACCOUNT_ID:userpool/YOUR_COGNITO_USER_POOL_ID
+
+  deletePost:
+    handler: deletePost 
+    package:
+      patterns:
+        - deletePost
+    events:
+      - http:
+          path: posts/{postId}
+          method: delete
+          cors: true
+          # authorizer: # Cognito 인증 추가 시 주석 해제 (2단계에서 진행)
+          #   name: cognitoAuthorizer
+          #   type: COGNITO_USER_POOLS
+          #   arn: arn:aws:cognito-idp:ap-northeast-2:YOUR_AWS_ACCOUNT_ID:userpool/YOUR_COGNITO_USER_POOL_ID
