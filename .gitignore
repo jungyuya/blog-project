@@ -1,4 +1,5 @@
-# Go Lang specific
+# Go Lang specific build artifacts
+# Go 컴파일 결과물 및 임시 파일
 *.exe
 *.dll
 *.so
@@ -9,41 +10,53 @@
 *.test
 *.prof
 
-# Go modules
+# Go modules cache and vendor directory
+# Go 모듈 캐시 및 벤더 디렉토리 (주로 CI/CD에서 사용)
 /vendor/
-/go.sum # go.mod만 커밋하고 go.sum은 제외하는 경우도 있지만, 보통은 go.sum도 커밋하여 의존성 일관성을 유지합니다.
-        # 현재 프로젝트에서는 go.mod, go.sum 모두 커밋하는 것이 좋습니다.
 
-# Serverless Framework specific
-.serverless/ # Serverless Framework가 배포 시 생성하는 임시 디렉토리
-.webpack/    # Webpack 관련 임시 디렉토리 (사용하지 않더라도 포함)
-.build/      # 빌드 아웃풋 디렉토리 (사용할 경우)
-.env         # 환경 변수 파일 (민감 정보 포함 가능성)
+# Serverless Framework specific artifacts
+# Serverless Framework 배포 시 생성되는 임시 파일 및 디렉토리
+.serverless/
+.webpack/
+.build/
+.env # 환경 변수 파일 (민감 정보 포함 가능성)
 
-# Go Lambda build artifacts (매우 중요!)
-# 각 함수 디렉토리 내에 생성되는 실행 파일 (bootstrap)
-createPost/bootstrap
-getPost/bootstrap
-getPosts/bootstrap
-updatePost/bootstrap
-deletePost/bootstrap
+# Go Lambda build artifacts (각 함수 디렉토리 내에 생성되는 실행 파일 및 ZIP 파일)
+# Lambda 배포를 위해 수동으로 생성하는 바이너리 및 ZIP 파일
+blog-backend/createPost/bootstrap
+blog-backend/getPost/bootstrap
+blog-backend/getPosts/bootstrap
+blog-backend/updatePost/bootstrap
+blog-backend/deletePost/bootstrap
 
-# 각 함수 디렉토리 내에 생성되는 ZIP 파일
-createPost/*.zip
-getPost/*.zip
-getPosts/*.zip
-updatePost/*.zip
-deletePost/*.zip
+blog-backend/createPost/*.zip
+blog-backend/getPost/*.zip
+blog-backend/getPosts/*.zip
+blog-backend/updatePost/*.zip
+blog-backend/deletePost/*.zip
 
-# IDE specific
-.vscode/ # VS Code 설정 (개인 선호에 따라 제외)
-.idea/   # IntelliJ / GoLand 설정
-*.swp    # Vim swap files
-*.bak    # Backup files
-*.log    # 로그 파일 (deploy_debug.log 등)
+# Terraform specific files
+# Terraform 관련 임시 파일, 상태 파일, 프로바이더 바이너리
+infrastructure/.terraform/ # Terraform 작업 디렉토리 (프로바이더 바이너리 포함)
+infrastructure/*.tfstate   # Terraform 상태 파일
+infrastructure/*.tfstate.backup # Terraform 상태 백업 파일
+# infrastructure/.terraform.lock.hcl # Provider 버전 고정을 위해 이 파일은 보통 커밋합니다.
 
-# Node.js dependencies
+# Node.js / Next.js specific files
+# Node.js 의존성 및 Next.js 빌드 결과물
 node_modules/
+.next/           # Next.js 빌드 아웃풋 디렉토리
+out/             # Next.js 정적 익스포트 아웃풋 디렉토리
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# IDE and OS specific files
+# 개발 환경 및 운영체제 관련 임시 파일
+.vscode/ # VS Code 설정 (개인 선호에 따라 제외)
+.idea/   # IntelliJ / GoLand 설정
+*.swp    # Vim swap files
+*.bak    # 백업 파일
+*.log    # 로그 파일 (deploy_debug.log 등)
+.DS_Store # macOS specific
+Thumbs.db # Windows specific
