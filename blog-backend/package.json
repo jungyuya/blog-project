@@ -1,5 +1,15 @@
 {
+  "name": "blog-backend",
+  "version": "1.0.0",
+  "description": "Serverless Go Backend for Blog",
   "devDependencies": {
+    "glob": "^10.0.0",
+    "serverless": "^4.17.0",
     "serverless-go-plugin": "^2.4.1"
-  }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
 }

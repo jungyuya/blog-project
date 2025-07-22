@@ -1,44 +1,58 @@
-service: blog-api-dev # 여러분의 서비스 이름. 변경하지 않는 것을 권장합니다.
+service: blog-api-dev
 
 provider:
   name: aws
-  runtime: go1.x 
-  region: ap-northeast-2 
-  stage: dev 
+  runtime: provided.al2
+  region: ap-northeast-2
+  stage: dev
   memorySize: 256
-  timeout: 15 # 람다 타임아웃 (초, 필요시 조정)
+  timeout: 15
   environment:
-    # 람다 함수에서 사용할 환경 변수 정의
-    DYNAMODB_TABLE: blog-posts 
+    DYNAMODB_TABLE: JungyuBlogPosts # Terraform으로 생성된 테이블 이름으로 변경
   iam:
-    role: # 람다 함수가 사용할 IAM 역할 정의
-      Fn::GetAtt:
-        - BlogLambdaExecutionRole 
-        - Arn
+    role: arn:aws:iam::786382940028:role/JungyuBlogLambdaExecutionRole # Terraform으로 생성된 IAM Role ARN으로 변경
 
 package:
-  individually: true 
+  individually: true # 각 함수별로 패키징합니다.
+  # 서비스 레벨 exclude는 Go 바이너리에 불필요한 파일이 없도록 최소화합니다.
+  exclude:
+    - ./** # 모든 파일을 일단 제외 (기본값)
+    # 아래 include 패턴에서 명시된 파일 외에는 모두 제외됩니다.
+    # 각 함수의 package.artifact에서 직접 zip 파일을 지정하므로, 여기에 추가적인 패턴이 필요하지 않습니다.
+    # 혹시 Go 모듈 파일(go.mod, go.sum)이 각 zip에 포함되어야 한다면, 해당 함수 artifact zip에 직접 포함시켜야 합니다.
+    # 현재는 Lambda 실행에 필수적이지 않으므로 제외된 상태입니다.
 
 plugins:
-  - serverless-go-plugin 
+  - serverless-go-plugin # 여전히 Go 빌드 환경 설정을 위해 사용합니다. (자동 빌드는 안 됨)
+
+custom:
+  go:
+    # 플러그인이 자동으로 빌드하는 대신, 수동 빌드를 위한 환경만 설정합니다.
+    goBuildMode: "mod"
+    goBuildEnvironment:
+      GO111MODULE: "on"
+      GOOS: linux
+      GOARCH: amd64
+    strip: true # 바이너리 용량 최적화 (수동 빌드 시에도 고려)
+    # bin 또는 buildTarget 설정은 이제 사용하지 않습니다.
+    # 이 플러그인은 Go 빌드를 위한 환경 변수를 제공하는 역할로만 사용합니다.
 
 functions:
   getPosts:
-    handler: getPosts 
+    handler: bootstrap
+    # 직접 빌드된 바이너리를 .zip 파일로 아티팩트화합니다.
     package:
-      patterns:
-        - getPosts
+      artifact: getPosts/getPosts.zip # <--- 수정됨: 압축 파일 이름을 명시합니다.
     events:
       - http:
           path: posts
           method: get
-          cors: true # CORS 활성화 
+          cors: true
 
   getPost:
-    handler: getPost 
+    handler: bootstrap
     package:
-      patterns:
-        - getPost
+      artifact: getPost/getPost.zip # <--- 수정됨
     events:
       - http:
           path: posts/{postId}
@@ -46,46 +60,31 @@ functions:
           cors: true
 
   createPost:
-    handler: createPost
+    handler: bootstrap
     package:
-      patterns:
-        - createPost
+      artifact: createPost/createPost.zip # <--- 수정됨
     events:
       - http:
           path: posts
           method: post
           cors: true
-          # authorizer: # Cognito 인증 추가 시 이 주석을 해제하고 ARN 채우기 (2단계에서 진행)
-          #   name: cognitoAuthorizer
-          #   type: COGNITO_USER_POOLS
-          #   arn: arn:aws:cognito-idp:ap-northeast-2:YOUR_AWS_ACCOUNT_ID:userpool/YOUR_COGNITO_USER_POOL_ID
 
   updatePost:
-    handler: updatePost # <--- updatePost 디렉토리의 컴파일된 바이너리 이름
+    handler: bootstrap
     package:
-      patterns:
-        - updatePost
+      artifact: updatePost/updatePost.zip # <--- 수정됨
     events:
       - http:
           path: posts/{postId}
           method: put
           cors: true
-          # authorizer: # Cognito 인증 추가 시 주석 해제 (2단계에서 진행)
-          #   name: cognitoAuthorizer
-          #   type: COGNITO_USER_POOLS
-          #   arn: arn:aws:cognito-idp:ap-northeast-2:YOUR_AWS_ACCOUNT_ID:userpool/YOUR_COGNITO_USER_POOL_ID
 
   deletePost:
-    handler: deletePost 
+    handler: bootstrap
     package:
-      patterns:
-        - deletePost
+      artifact: deletePost/deletePost.zip # <--- 수정됨
     events:
       - http:
           path: posts/{postId}
           method: delete
           cors: true
-          # authorizer: # Cognito 인증 추가 시 주석 해제 (2단계에서 진행)
-          #   name: cognitoAuthorizer
-          #   type: COGNITO_USER_POOLS
-          #   arn: arn:aws:cognito-idp:ap-northeast-2:YOUR_AWS_ACCOUNT_ID:userpool/YOUR_COGNITO_USER_POOL_ID

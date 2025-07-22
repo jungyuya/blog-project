@@ -1,0 +1,49 @@
+# Go Lang specific
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.obj
+*.test
+*.prof
+
+# Go modules
+/vendor/
+/go.sum # go.mod만 커밋하고 go.sum은 제외하는 경우도 있지만, 보통은 go.sum도 커밋하여 의존성 일관성을 유지합니다.
+        # 현재 프로젝트에서는 go.mod, go.sum 모두 커밋하는 것이 좋습니다.
+
+# Serverless Framework specific
+.serverless/ # Serverless Framework가 배포 시 생성하는 임시 디렉토리
+.webpack/    # Webpack 관련 임시 디렉토리 (사용하지 않더라도 포함)
+.build/      # 빌드 아웃풋 디렉토리 (사용할 경우)
+.env         # 환경 변수 파일 (민감 정보 포함 가능성)
+
+# Go Lambda build artifacts (매우 중요!)
+# 각 함수 디렉토리 내에 생성되는 실행 파일 (bootstrap)
+createPost/bootstrap
+getPost/bootstrap
+getPosts/bootstrap
+updatePost/bootstrap
+deletePost/bootstrap
+
+# 각 함수 디렉토리 내에 생성되는 ZIP 파일
+createPost/*.zip
+getPost/*.zip
+getPosts/*.zip
+updatePost/*.zip
+deletePost/*.zip
+
+# IDE specific
+.vscode/ # VS Code 설정 (개인 선호에 따라 제외)
+.idea/   # IntelliJ / GoLand 설정
+*.swp    # Vim swap files
+*.bak    # Backup files
+*.log    # 로그 파일 (deploy_debug.log 등)
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

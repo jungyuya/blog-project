@@ -21,9 +21,7 @@ data "aws_route53_zone" "jungyu_store_hosted_zone" {
 # S3 버킷 생성 (블로그 프론트엔드 정적 파일 호스팅용)
 resource "aws_s3_bucket" "blog_frontend_bucket" {
   # 이 버킷 이름은 AWS 내에서 전역적으로 고유해야 합니다.
-  # 만약 "jungyu-blog-frontend-20250721"이 이미 사용 중이라는 오류가 발생하면,
-  # 고유한 이름으로 변경해주세요. (예: "jungyu-blog-frontend-20250721-v2")
-  bucket = "jungyu-blog-frontend-20250721" 
+  bucket = "jungyu-blog-frontend-20250722" 
 
   tags = {
     Name        = "JungyuBlogFrontendBucket"
@@ -82,9 +80,7 @@ resource "aws_s3_bucket_public_access_block" "blog_frontend_bucket_public_access
 # 블로그 이미지 저장용 S3 버킷 (별도)
 resource "aws_s3_bucket" "blog_image_bucket" {
   # 이 버킷 이름 또한 AWS 내에서 전역적으로 고유해야 합니다.
-  # 만약 "jungyu-blog-image-storage-20250721"이 이미 사용 중이라는 오류가 발생하면,
-  # 고유한 이름으로 변경해주세요.
-  bucket = "jungyu-blog-image-storage-20250721" 
+  bucket = "jungyu-blog-image-storage-20250722" 
 
   tags = {
     Name        = "BlogImageStorage"
