@@ -103,7 +103,7 @@ resource "aws_s3_bucket_public_access_block" "blog_image_bucket_public_access_bl
 # ACM 인증서 발급 (HTTPS를 위해 필수이며, CloudFront는 us-east-1 리전 인증서만 지원)
 resource "aws_acm_certificate" "blog_domain_cert" {
   provider          = aws.us_east_1 # us-east-1 리전에서 발급
-  domain_name       = "blog.jungyu.store" # 실제 사용할 서브도메인 (예: blog.yourdomain.com)
+  domain_name       = "blog.jungyu.store" # 실제 사용할 서브도메인 
   # subject_alternative_names = ["jungyu.store"] # 루트 도메인도 HTTPS로 사용하려면 이 줄의 주석을 해제합니다.
   validation_method = "DNS" # Route 53을 통한 DNS 유효성 검사
 
@@ -135,8 +135,6 @@ resource "aws_acm_certificate_validation" "blog_domain_cert_validation" {
   provider        = aws.us_east_1
   certificate_arn = aws_acm_certificate.blog_domain_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.blog_domain_cert_validation : record.fqdn]
-  # ACM 인증서가 발급되기 위해 충분한 시간(몇 분~몇 시간)이 필요할 수 있습니다.
-  # 만약 apply가 실패하면 기다렸다가 다시 시도하거나, 아래 depends_on을 추가할 수 있습니다.
   # depends_on = [aws_route53_record.blog_domain_cert_validation]
 }
 
