@@ -38,6 +38,7 @@ type Post struct {
 	PostID    string `json:"postId" dynamodbav:"postId"`
 	Title     string `json:"title" dynamodbav:"title"`
 	Content   string `json:"content" dynamodbav:"content"`
+	Author    string `json:"author" dynamodbav:"author"`
 	CreatedAt string `json:"createdAt" dynamodbav:"createdAt"`
 	UpdatedAt string `json:"updatedAt" dynamodbav:"updatedAt"`
 }

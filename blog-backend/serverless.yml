@@ -8,9 +8,9 @@ provider:
   memorySize: 256
   timeout: 15
   environment:
-    DYNAMODB_TABLE: JungyuBlogPosts # Terraform으로 생성된 테이블 이름으로 변경
+    DYNAMODB_TABLE: JungyuBlogPosts 
   iam:
-    role: arn:aws:iam::786382940028:role/JungyuBlogLambdaExecutionRole # Terraform으로 생성된 IAM Role ARN으로 변경
+    role: arn:aws:iam::786382940028:role/JungyuBlogLambdaExecutionRole 
 
 package:
   individually: true # 각 함수별로 패키징합니다.
@@ -72,7 +72,7 @@ functions:
   updatePost:
     handler: bootstrap
     package:
-      artifact: updatePost/updatePost.zip # <--- 수정됨
+      artifact: updatePost/updatePost.zip 
     events:
       - http:
           path: posts/{postId}
@@ -82,7 +82,7 @@ functions:
   deletePost:
     handler: bootstrap
     package:
-      artifact: deletePost/deletePost.zip # <--- 수정됨
+      artifact: deletePost/deletePost.zip 
     events:
       - http:
           path: posts/{postId}

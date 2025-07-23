@@ -51,11 +51,12 @@ func init() {
 // Post 구조체는 블로그 게시물의 데이터 모델을 정의합니다.
 // `json:"..."` 태그는 이 구조체가 JSON 데이터를 마샬링(Go 객체를 JSON으로 변환)하거나
 // 언마샬링(JSON을 Go 객체로 변환)할 때 사용될 필드 이름을 지정합니다.
-// `dynamodbav:"..."` 태그는 이 구조체가 DynamoDB 항목(AttributeValue 맵)으로 변환될 때 사용될 속성 이름을 지정합니다.
+// `dynamodbav:"..."` 태그는 이 구조체가 DynamoDB 항목(AttributeValue)으로 변환될 때 사용될 속성 이름을 지정합니다.
 type Post struct {
 	PostID    string `json:"postId" dynamodbav:"postId"`      // 게시물 고유 ID
 	Title     string `json:"title" dynamodbav:"title"`        // 게시물 제목
 	Content   string `json:"content" dynamodbav:"content"`    // 게시물 내용
+	Author    string `json:"author" dynamodbav:"author"`      // 게시물 작성자 ⭐ 이 필드는 이미 추가되어 있습니다. ⭐
 	CreatedAt string `json:"createdAt" dynamodbav:"createdAt"`// 게시물 생성 시각 (ISO 8601 형식)
 	UpdatedAt string `json:"updatedAt" dynamodbav:"updatedAt"`// 게시물 마지막 업데이트 시각 (ISO 8601 형식)
 }
@@ -91,9 +92,11 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	// 1. HTTP 요청 본문 파싱 (JSON 언마샬링)
 	// 클라이언트로부터 전송된 JSON 요청 본문을 Go의 임시 구조체에 매핑합니다.
+	// ⭐ 이 newPostData 구조체에 Author 필드를 추가해야 합니다. ⭐
 	var newPostData struct {
 		Title   string `json:"title"`
 		Content string `json:"content"`
+		Author  string `json:"author"` // ⭐ 이 줄을 추가합니다. ⭐
 	}
 	err := json.Unmarshal([]byte(request.Body), &newPostData)
 	if err != nil {
@@ -102,10 +105,11 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return apiGatewayResponse(400, `{"message": "Invalid request body"}`), nil
 	}
 
-	// 입력 데이터 유효성 검사: 제목이나 내용이 비어있는지 확인합니다.
-	if newPostData.Title == "" || newPostData.Content == "" {
-		fmt.Println("제목 또는 내용이 비어 있습니다.")
-		return apiGatewayResponse(400, `{"message": "Title and content cannot be empty"}`), nil
+	// 입력 데이터 유효성 검사: 제목, 내용, 작성자가 비어있는지 확인합니다.
+	// ⭐ Author 유효성 검사 조건을 추가해야 합니다. ⭐
+	if newPostData.Title == "" || newPostData.Content == "" || newPostData.Author == "" {
+		fmt.Println("제목, 내용 또는 작성자가 비어 있습니다.")
+		return apiGatewayResponse(400, `{"message": "Title, content, and author cannot be empty"}`), nil
 	}
 
 	// 2. 새로운 Post 객체 생성 및 필드 초기화
@@ -115,8 +119,9 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		PostID:    uuid.New().String(), // `github.com/google/uuid` 패키지를 사용하여 고유한 UUID를 생성합니다.
 		Title:     newPostData.Title,
 		Content:   newPostData.Content,
-		CreatedAt: now, // 생성 시각 설정
-		UpdatedAt: now, // 초기 업데이트 시각은 생성 시각과 동일하게 설정
+		Author:    newPostData.Author, // ⭐ newPostData에서 Author 값을 할당합니다. ⭐
+		CreatedAt: now,                // 생성 시각 설정
+		UpdatedAt: now,                // 초기 업데이트 시각은 생성 시각과 동일하게 설정
 	}
 
 	// 3. Post 객체를 DynamoDB Item 형식으로 마샬링

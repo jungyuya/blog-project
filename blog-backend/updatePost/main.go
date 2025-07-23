@@ -34,10 +34,12 @@ func init() {
 }
 
 // Post 구조체 (다른 함수들과 동일하게 정의)
+// ⭐ Author 필드가 여기에 추가되어 있어야 합니다. ⭐
 type Post struct {
 	PostID    string `json:"postId" dynamodbav:"postId"`
 	Title     string `json:"title" dynamodbav:"title"`
 	Content   string `json:"content" dynamodbav:"content"`
+	Author    string `json:"author" dynamodbav:"author"` // ⭐ 이 필드가 있는지 확인
 	CreatedAt string `json:"createdAt" dynamodbav:"createdAt"`
 	UpdatedAt string `json:"updatedAt" dynamodbav:"updatedAt"`
 }
@@ -76,9 +78,11 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	// 1. 요청 본문 파싱 (업데이트할 데이터)
 	// 클라이언트로부터 전송된 JSON 요청 본문을 Go의 임시 구조체에 매핑합니다.
+	// ⭐ 여기에 Author 필드를 추가합니다. ⭐
 	var updatedPostData struct {
 		Title   string `json:"title"`
 		Content string `json:"content"`
+		Author  string `json:"author"` // ⭐ 이 줄을 추가합니다. ⭐
 	}
 	err := json.Unmarshal([]byte(request.Body), &updatedPostData)
 	if err != nil {
@@ -87,30 +91,34 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	// 유효성 검사: 업데이트할 내용이 비어있는지 확인합니다.
-	if updatedPostData.Title == "" && updatedPostData.Content == "" {
-		fmt.Println("업데이트할 제목 또는 내용이 없습니다.")
-		return apiGatewayResponse(400, `{"message": "Title or content must be provided for update"}`), nil
+	// ⭐ Author 유효성 검사 조건도 추가합니다. ⭐
+	if updatedPostData.Title == "" || updatedPostData.Content == "" || updatedPostData.Author == "" {
+		fmt.Println("업데이트할 제목, 내용 또는 작성자가 비어 있습니다.")
+		return apiGatewayResponse(400, `{"message": "Title, content, and author must be provided for update"}`), nil
 	}
 
 	// 2. DynamoDB UpdateItem API 호출을 위한 Input 구성
 	// `UpdateExpression`은 DynamoDB 항목을 어떻게 업데이트할지 정의하는 문자열입니다.
-	// `#T`, `#C`, `#U`는 ExpressionAttributeNames에 정의될 속성 이름의 플레이스홀더입니다.
-	// `:t`, `:c`, `:u`는 ExpressionAttributeValues에 정의될 실제 값의 플레이스홀더입니다.
-	updateExpression := "SET #T = :t, #C = :c, #U = :u"
+	// ⭐ #A (Author)와 :a (author value)를 추가합니다. ⭐
+	updateExpression := "SET #T = :t, #C = :c, #A = :a, #U = :u"
 	
 	// `ExpressionAttributeNames`는 DynamoDB 예약어(예: "Content")와 충돌을 피하기 위해
 	// 실제 속성 이름을 플레이스홀더에 매핑합니다.
+	// ⭐ #A (Author)를 추가합니다. ⭐
 	expressionAttributeNames := map[string]*string{
 		"#T": aws.String("title"),
 		"#C": aws.String("content"),
+		"#A": aws.String("author"), // ⭐ 이 줄을 추가합니다. ⭐
 		"#U": aws.String("updatedAt"),
 	}
 
 	// `ExpressionAttributeValues`는 UpdateExpression에서 사용될 실제 값들을 정의합니다.
+	// ⭐ :a (author value)를 추가합니다. ⭐
 	now := time.Now().UTC().Format(time.RFC3339)
 	expressionAttributeValues := map[string]*dynamodb.AttributeValue{
 		":t": {S: aws.String(updatedPostData.Title)},
 		":c": {S: aws.String(updatedPostData.Content)},
+		":a": {S: aws.String(updatedPostData.Author)}, // ⭐ 이 줄을 추가합니다. ⭐
 		":u": {S: aws.String(now)},
 	}
 
