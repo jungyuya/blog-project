@@ -79,7 +79,7 @@ export default function PostDetailPage() {
         try {
           const errorJson = JSON.parse(errorText);
           errorMessage = errorJson.message || errorMessage;
-        } catch (e) {
+        } catch (_e) {
           // JSON 파싱 실패 시 원본 텍스트 사용
         }
         throw new Error(errorMessage);
