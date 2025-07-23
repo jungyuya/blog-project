@@ -1,5 +1,12 @@
-# Go Lang specific build artifacts
-# Go 컴파일 결과물 및 임시 파일
+# =========================================================================
+# Project Root-level .gitignore for blog-project Monorepo
+# This file should be placed in the ~/blog-project/ directory.
+# =========================================================================
+
+# -------------------------------------------------------------------------
+# Go Lang Specific (blog-backend)
+# -------------------------------------------------------------------------
+# Compiled Go binaries and temporary files
 *.exe
 *.dll
 *.so
@@ -10,59 +17,80 @@
 *.test
 *.prof
 
-# Go modules cache and vendor directory
-# Go 모듈 캐시 및 벤더 디렉토리 (주로 CI/CD에서 사용)
+# Go modules cache and vendor directory (commonly used in CI/CD)
 /vendor/
 
-# Serverless Framework specific artifacts
-# Serverless Framework 배포 시 생성되는 임시 파일 및 디렉토리
-.serverless/
-.webpack/
-.build/
-.env # 환경 변수 파일 (민감 정보 포함 가능성)
-.env.local
-
-# Go Lambda build artifacts (각 함수 디렉토리 내에 생성되는 실행 파일 및 ZIP 파일)
-# Lambda 배포를 위해 수동으로 생성하는 바이너리 및 ZIP 파일
+# Go Lambda build artifacts specific to blog-backend
+# These are the 'bootstrap' executables generated within each function directory
 blog-backend/createPost/bootstrap
+blog-backend/deletePost/bootstrap
 blog-backend/getPost/bootstrap
 blog-backend/getPosts/bootstrap
 blog-backend/updatePost/bootstrap
-blog-backend/deletePost/bootstrap
 
-blog-backend/createPost/*.zip
-blog-backend/getPost/*.zip
-blog-backend/getPosts/*.zip
-blog-backend/updatePost/*.zip
-blog-backend/deletePost/*.zip
+# The custom .bin directory where Makefile might place compiled binaries
+blog-backend/.bin/
 
-# Terraform specific files
-# Terraform 관련 임시 파일, 상태 파일, 프로바이더 바이너리
-infrastructure/.terraform/ # Terraform 작업 디렉토리 (프로바이더 바이너리 포함)
-infrastructure/*.tfstate   # Terraform 상태 파일
-infrastructure/*.tfstate.backup # Terraform 상태 백업 파일
-# infrastructure/.terraform.lock.hcl # Provider 버전 고정을 위해 이 파일은 보통 커밋합니다.
+# The 'artifacts' directory where Makefile creates final ZIP packages for Lambda
+blog-backend/artifacts/
 
-# Node.js / Next.js specific files
-# Node.js 의존성 및 Next.js 빌드 결과물
+# Go module sum files for dependency integrity (usually committed, but if you prefer to ignore)
+# go.sum # Uncomment if you want to ignore go.sum (generally not recommended)
+
+# -------------------------------------------------------------------------
+# Serverless Framework Specific (blog-backend)
+# -------------------------------------------------------------------------
+# Temporary files and directories created by Serverless Framework during deployment
+blog-backend/.serverless/
+blog-backend/.webpack/ # If you were using Webpack with Serverless
+blog-backend/.build/   # Another common build output for Serverless plugins
+
+# Environment variable files (can contain sensitive information)
+blog-backend/.env
+blog-backend/.env.local
+
+# -------------------------------------------------------------------------
+# Node.js / Next.js Specific (blog-frontend)
+# -------------------------------------------------------------------------
+# Node.js dependency directory
 node_modules/
-.next/           # Next.js 빌드 아웃풋 디렉토리
-out/             # Next.js 정적 익스포트 아웃풋 디렉토리
+
+# Next.js build output directories
+# .next/ is for Next.js internal build artifacts (server-side, client-side bundles)
+# out/ is for static HTML export (used for S3 static hosting)
+blog-frontend/.next/
+blog-frontend/out/
+
+# Node.js debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# IDE and OS specific files
-# 개발 환경 및 운영체제 관련 임시 파일
-.vscode/ # VS Code 설정 (개인 선호에 따라 제외)
-.idea/   # IntelliJ / GoLand 설정
-*.swp    # Vim swap files
-*.bak    # 백업 파일
-*.log    # 로그 파일 (deploy_debug.log 등)
-.DS_Store # macOS specific
-Thumbs.db # Windows specific
+# -------------------------------------------------------------------------
+# Terraform Specific (infrastructure)
+# -------------------------------------------------------------------------
+# Terraform working directory (contains provider binaries)
+infrastructure/.terraform/
+# Terraform state files (CRITICAL: NEVER COMMIT TO GIT IF NOT USING REMOTE STATE)
+infrastructure/*.tfstate
+infrastructure/*.tfstate.backup
+# Terraform lock file (usually committed to ensure consistent provider versions)
+# infrastructure/.terraform.lock.hcl # Keep this commented to commit the lock file
 
-# If you specifically want to ignore all .zip and bootstrap files anywhere,
-# you can keep these general rules, but the specific paths above are more precise.
-# **/*.zip
-# **/bootstrap
+# -------------------------------------------------------------------------
+# IDE and OS Specific Files
+# -------------------------------------------------------------------------
+# Common IDE configuration directories (personal preference to ignore)
+.vscode/ # VS Code specific settings
+.idea/   # IntelliJ / GoLand specific settings
+
+# Editor swap files
+*.swp    # Vim swap files
+*.bak    # Backup files
+
+# Log files
+*.log    # General log files (e.g., deploy_debug.log)
+
+# Operating System specific files
+.DS_Store # macOS specific desktop services store
+Thumbs.db # Windows specific thumbnail cache
