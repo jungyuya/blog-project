@@ -4,7 +4,7 @@ service: blog-api-dev
 
 provider:
   name: aws
-  runtime: provided.al2   # Go Custom Runtime 사용
+  runtime: provided.al2   # Go Custom Runtime 
   region: ap-northeast-2
   stage: dev
   memorySize: 256
