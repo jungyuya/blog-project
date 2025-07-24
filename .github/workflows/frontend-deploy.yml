@@ -58,6 +58,13 @@ jobs:
 
       # 7. CloudFront 캐시 무효화 (Invalidation): CloudFront 캐시를 무효화하여 최신 변경 사항이 사용자에게 즉시 반영되도록 합니다.
       - name: Invalidate CloudFront Cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
-        env: # CloudFront 배포 ID를 환경 변수로 전달
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} # GitHub Secret에서 CloudFront 배포 ID 가져오기
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*" \
+            --caller-reference "$(date +%s)" # 고유한 참조 ID (현재 타임스탬프 사용)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
