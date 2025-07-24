@@ -27,7 +27,7 @@ export default function NewPostPage() {
     setError(null); // 이전 에러 메시지 초기화
 
     try {
-      const response = await fetch(`${BACKEND_BASE_URL}/posts`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

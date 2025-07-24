@@ -7,19 +7,19 @@ interface PostIdParam {
   id: string;
 }
 
-// export 시 동적 경로를 미리 생성
+// 최대 20개만 미리 생성하도록 제한 추가
 export async function generateStaticParams() {
   try {
     const res = await fetch(`${BACKEND_BASE_URL}/posts`);
     if (!res.ok) return [];
     const posts: { postId: string }[] = await res.json();
-    return posts.map(p => ({ id: p.postId }));
+
+    return posts.slice(0, 20).map(p => ({ id: p.postId }));
   } catch {
     return [];
   }
 }
 
-// async 로직만 두고, metadata는 일단 빼 버립니다.
 export default async function EditPage({
   params,
 }: {

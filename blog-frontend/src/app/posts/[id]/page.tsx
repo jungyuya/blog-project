@@ -1,4 +1,3 @@
-// src/app/posts/[id]/page.tsx
 import { BACKEND_BASE_URL } from '@/config/backend_config';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -17,25 +16,21 @@ interface PostIdParam {
   id: string;
 }
 
-// 1) export 모드에서 동적 경로를 미리 생성
+// 1) generateStaticParams에 개수 제한을 두어 미리 렌더링할 경로를 줄임 (최대 20개)
 export async function generateStaticParams() {
   try {
     const res = await fetch(`${BACKEND_BASE_URL}/posts`);
     if (!res.ok) return [];
     const posts: Post[] = await res.json();
-    return posts.map((p) => ({ id: p.postId }));
+
+    // 최대 20개 포스트만 미리 렌더링
+    return posts.slice(0, 20).map((p) => ({ id: p.postId }));
   } catch {
     return [];
   }
 }
 
-// 2) (옵션) generateMetadata를 뺀 상태로 에러 방지
-// export async function generateMetadata({ params }: { params: Promise<PostIdParam> }) {
-//   const { id } = await params;
-//   // ... 생략
-// }
-
-// 3) 페이지 컴포넌트: 오류를 모두 잡아서 prerender 단계에서 throw되지 않게 함
+// 2) 페이지 컴포넌트: 동적 경로에 따른 상세 페이지
 export default async function PostDetailPage({
   params,
 }: {
@@ -48,7 +43,7 @@ export default async function PostDetailPage({
   let error: string | null = null;
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${id}`);
+    const res = await fetch(`${BACKEND_BASE_URL}/posts/${id}`);
     if (!res.ok) {
       if (res.status === 404) notFound();
       const txt = await res.text();
