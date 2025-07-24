@@ -63,4 +63,5 @@ jobs:
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*" \
         env:
-          AWS_DEFAULT_REGION: ap-northeast-2
+          AWS_DEFAULT_REGION: ap-northeast-2 
+          # CloudFront는 글로벌 서비스라서 서울로하든 아프리카로하든 AWS CLI가 그냥 글로벌 리전에 있는 것 처럼 작동함.
