@@ -2,7 +2,6 @@
 
 name: Frontend CI/CD (Next.js)
 
-# 이 워크플로우는 'main' 브랜치에 'blog-frontend/' 경로의 변경 사항이 푸시될 때 실행됩니다.
 on:
   push:
     branches:
@@ -12,8 +11,8 @@ on:
       - '.github/workflows/frontend-deploy.yml'
 
 permissions:
-  id-token: write   # OIDC를 통해 AWS 자격 증명 요청
-  contents: read    # 리포지토리에서 코드 체크아웃
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
@@ -45,16 +44,14 @@ jobs:
         working-directory: blog-frontend
 
       # 5. Next.js 애플리케이션 빌드
+      #    Next.js 15부터는 `output: 'export'` 설정 덕분에 빌드만으로 out/ 생성됨
       - name: Build Next.js Application
         run: npm run build
         working-directory: blog-frontend
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.BACKEND_API_URL }}
 
-      # 5.5. Next.js 정적 내보내기(export) = out/ 생성
-      - name: Export Static HTML
-        run: npx next export
-        working-directory: blog-frontend
+      # (이제 export 스텝 없음 — build만으로 out/이 만들어짐)
 
       # 6. 빌드된 정적 파일 S3 업로드
       - name: Upload to S3
