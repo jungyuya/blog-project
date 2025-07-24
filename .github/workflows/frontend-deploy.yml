@@ -53,7 +53,7 @@ jobs:
 
       # 5.5. Next.js 정적 내보내기(export) = out/ 생성
       - name: Export Static HTML
-        run: npm run export
+        run: npx next export
         working-directory: blog-frontend
 
       # 6. 빌드된 정적 파일 S3 업로드
