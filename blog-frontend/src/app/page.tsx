@@ -24,7 +24,7 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch(`${BACKEND_BASE_URL}/posts`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts`);
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText} - ${errorText}`);

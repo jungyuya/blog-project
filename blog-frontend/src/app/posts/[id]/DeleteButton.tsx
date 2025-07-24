@@ -24,7 +24,7 @@ export default function DeleteButton({ postId }: DeleteButtonProps) {
         setError(null);
 
         try {
-            const response = await fetch(`${BACKEND_BASE_URL}/posts/${postId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URLL}/posts/${postId}`, {
                 method: 'DELETE',
             });
 

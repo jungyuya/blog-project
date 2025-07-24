@@ -48,7 +48,7 @@ export default async function PostDetailPage({
   let error: string | null = null;
 
   try {
-    const res = await fetch(`${BACKEND_BASE_URL}/posts/${id}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/posts/${id}`);
     if (!res.ok) {
       if (res.status === 404) notFound();
       const txt = await res.text();
