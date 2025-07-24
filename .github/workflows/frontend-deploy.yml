@@ -7,61 +7,65 @@ on:
   push:
     branches:
       - main
-    paths: # blog-frontend 디렉토리 내 변경 사항만 감지
+    paths:
       - 'blog-frontend/**'
-      - '.github/workflows/frontend-deploy.yml' # 워크플로우 파일 자체의 변경도 감지
+      - '.github/workflows/frontend-deploy.yml'
 
-# 작업을 실행할 권한을 정의합니다. 백엔드와 동일하게 OIDC 사용.
 permissions:
-  id-token: write # OIDC를 통해 임시 AWS 자격 증명을 요청하기 위해 필요
-  contents: read  # 리포지토리에서 코드를 체크아웃하기 위해 필요
+  id-token: write   # OIDC를 통해 AWS 자격 증명 요청
+  contents: read    # 리포지토리에서 코드 체크아웃
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # 워크플로우를 실행할 가상 환경 (GitHub 호스팅 러너)
+    runs-on: ubuntu-latest
+
     steps:
-      # 1. 코드 체크아웃: GitHub 저장소에서 코드를 러너로 가져옵니다.
+      # 1. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Node.js 환경 설정: 지정된 Node.js 버전을 설치하고 npm 캐싱을 활성화합니다.
+      # 2. Node.js 환경 설정
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: 'blog-frontend/package-lock.json' # npm 캐시 경로 지정
+          cache-dependency-path: 'blog-frontend/package-lock.json'
 
-      # 3. AWS Credentials 설정 (OIDC 사용): GitHub Actions가 AWS 리소스에 안전하게 접근하도록 임시 자격 증명을 구성합니다.
+      # 3. AWS 자격 증명 설정 (OIDC)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} # GitHub Secret에서 AWS IAM 역할 ARN 가져오기
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ap-northeast-2
 
-      # 4. 프론트엔드 종속성 설치: blog-frontend/package.json 에 정의된 모든 Node.js 종속성을 설치합니다.
+      # 4. 프론트엔드 종속성 설치
       - name: Install Frontend Dependencies
-        run: npm install
-        working-directory: blog-frontend # blog-frontend 디렉토리에서 명령 실행
+        run: npm ci
+        working-directory: blog-frontend
 
-      # 5. Next.js 애플리케이션 빌드: Next.js 애플리케이션을 프로덕션 모드로 빌드합니다.
+      # 5. Next.js 애플리케이션 빌드
       - name: Build Next.js Application
         run: npm run build
-        working-directory: blog-frontend # blog-frontend 디렉토리에서 명령 실행
-        env: # Next.js 빌드 시 필요한 환경 변수 (예: 백엔드 API URL)
-          NEXT_PUBLIC_API_URL: ${{ secrets.BACKEND_API_URL }} # 백엔드 API Gateway URL
+        working-directory: blog-frontend
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.BACKEND_API_URL }}
 
-      # 6. 빌드된 정적 파일 S3 업로드: 빌드된 'out' 디렉토리의 내용을 S3 버킷에 동기화합니다.
+      # 5.5. Next.js 정적 내보내기(export) = out/ 생성
+      - name: Export Static HTML
+        run: npm run export
+        working-directory: blog-frontend
+
+      # 6. 빌드된 정적 파일 S3 업로드
       - name: Upload to S3
-        run: aws s3 sync ./out/ s3://blog.jungyu.store --delete # S3 버킷에 파일 동기화 (--delete로 불필요한 파일 삭제)
-        working-directory: blog-frontend # blog-frontend 디렉토리에서 명령 실행
+        run: aws s3 sync ./out/ s3://blog.jungyu.store --delete
+        working-directory: blog-frontend
 
-      # 7. CloudFront 캐시 무효화 (Invalidation): CloudFront 캐시를 무효화하여 최신 변경 사항이 사용자에게 즉시 반영되도록 합니다.
+      # 7. CloudFront 캐시 무효화
       - name: Invalidate CloudFront Cache
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*" \
+            --paths "/*"
         env:
-          AWS_DEFAULT_REGION: ap-northeast-2 
-          # CloudFront는 글로벌 서비스라서 서울로하든 아프리카로하든 AWS CLI가 그냥 글로벌 리전에 있는 것 처럼 작동함.
+          AWS_DEFAULT_REGION: ap-northeast-2
