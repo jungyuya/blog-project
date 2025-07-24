@@ -20,7 +20,7 @@ interface PostIdParam {
 // 1) export 모드에서 동적 경로를 미리 생성
 export async function generateStaticParams() {
   try {
-    const res = await fetch(`${BACKEND_BASE_URL}/posts`, { cache: 'no-store' });
+    const res = await fetch(`${BACKEND_BASE_URL}/posts`);
     if (!res.ok) return [];
     const posts: Post[] = await res.json();
     return posts.map((p) => ({ id: p.postId }));
@@ -48,7 +48,7 @@ export default async function PostDetailPage({
   let error: string | null = null;
 
   try {
-    const res = await fetch(`${BACKEND_BASE_URL}/posts/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${BACKEND_BASE_URL}/posts/${id}`);
     if (!res.ok) {
       if (res.status === 404) notFound();
       const txt = await res.text();

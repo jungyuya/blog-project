@@ -10,7 +10,7 @@ interface PostIdParam {
 // export 시 동적 경로를 미리 생성
 export async function generateStaticParams() {
   try {
-    const res = await fetch(`${BACKEND_BASE_URL}/posts`, { cache: 'no-store' });
+    const res = await fetch(`${BACKEND_BASE_URL}/posts`);
     if (!res.ok) return [];
     const posts: { postId: string }[] = await res.json();
     return posts.map(p => ({ id: p.postId }));
