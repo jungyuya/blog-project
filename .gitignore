@@ -95,4 +95,9 @@ infrastructure/*.tfstate.backup
 .DS_Store # macOS specific desktop services store
 Thumbs.db # Windows specific thumbnail cache
 
-./infrastructure
+# Terraform 관련 캐시 파일 무시
+.terraform/
+*.tfstate
+*.tfstate.backup
+terraform.tfstate
+terraform.tfstate.backup
