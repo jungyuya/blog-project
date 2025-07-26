@@ -1,0 +1,48 @@
+# .github/workflows/deploy.yml
+
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: "1.24.5"
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ap-northeast-2
+
+    - name: Terraform Init & Apply
+      working-directory: infrastructure
+      run: |
+        terraform init
+        terraform apply -auto-approve
+
+    - name: Lambda Build
+      working-directory: blog-backend
+      run: make build
+
+    - name: SST Deploy
+      working-directory: blog-infra
+      run: npx sst deploy
+
+    - name: Frontend Build & Deploy
+      working-directory: blog-frontend
+      run: bash deploy.sh

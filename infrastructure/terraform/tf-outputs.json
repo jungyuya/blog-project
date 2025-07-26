@@ -1,0 +1,57 @@
+{
+  "acm_certificate_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:acm:us-east-1:786382940028:certificate/d8aa46d8-b8dc-4d1b-b590-c5d4a52b7081"
+  },
+  "blog_cloudfront_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://d1ddbxfv2lmyee.cloudfront.net"
+  },
+  "blog_custom_domain_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://blog.jungyu.store"
+  },
+  "blog_frontend_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "jungyu-blog-frontend-20250722"
+  },
+  "blog_image_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "jungyu-blog-image-storage-20250722"
+  },
+  "cloudfront_domain_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "d1ddbxfv2lmyee.cloudfront.net"
+  },
+  "cloudfront_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "E38AGX8DZ0QC6C"
+  },
+  "cognito_user_pool_client_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "37i1hffj765d0rjq88mgcf4ut9"
+  },
+  "cognito_user_pool_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ap-northeast-2_PGIpEKhHr"
+  },
+  "dynamodb_posts_table_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "JungyuBlogPosts"
+  },
+  "lambda_execution_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::786382940028:role/JungyuBlogLambdaExecutionRole"
+  }
+}

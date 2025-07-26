@@ -1,0 +1,18 @@
+{
+  "name": "blog-project",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "blog-backend",
+    "blog-frontend",
+    "infrastructure"
+  ],
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.4",
+    "@types/node": "^24.1.0",
+    "aws-cdk-lib": "^2.207.0",
+    "constructs": "^10.4.2",
+    "sst": "^3.17.10",
+    "typescript": "^5.8.3"
+  }
+}

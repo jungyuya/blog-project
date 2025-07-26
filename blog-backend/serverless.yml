@@ -4,22 +4,20 @@ service: blog-api-dev
 
 provider:
   name: aws
-  runtime: provided.al2   # Go Custom Runtime 
+  runtime: provided.al2023
   region: ap-northeast-2
   stage: dev
-  memorySize: 256
-  timeout: 15
   environment:
     DYNAMODB_TABLE: JungyuBlogPosts
   iam:
     role: arn:aws:iam::786382940028:role/JungyuBlogLambdaExecutionRole
 
 package:
-  individually: true  # 각 함수를 개별적으로 패키징합니다.
+  individually: true
 
 functions:
   getPosts:
-    handler: bootstrap       # Custom Runtime은 이 핸들러 대신 'bootstrap' 실행 파일을 찾습니다.
+    handler: bootstrap
     package:
       artifact: ./artifacts/getPosts.zip
     events:
