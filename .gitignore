@@ -94,3 +94,5 @@ infrastructure/*.tfstate.backup
 # Operating System specific files
 .DS_Store # macOS specific desktop services store
 Thumbs.db # Windows specific thumbnail cache
+
+./infrastructure
